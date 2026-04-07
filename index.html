@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>ABS齿数计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a1a 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #ff00aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tire-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .input-group {
+            flex: 1;
+            min-width: 60px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        
+        .input-group input::-webkit-outer-spin-button,
+        .input-group input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0,212,255,0.2);
+        }
+        
+        .separator {
+            font-size: 24px;
+            color: #555;
+            font-weight: bold;
+            padding: 0 2px;
+        }
+        
+        .diameter-hint {
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: #00d4ff;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+        
+        .gear-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .gear-input input {
+            flex: 1;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        
+        .gear-input input::-webkit-outer-spin-button,
+        .gear-input input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .gear-input input:focus {
+            outline: none;
+            border-color: #ff00aa;
+            box-shadow: 0 0 20px rgba(255,0,170,0.2);
+        }
+        
+        .gear-unit {
+            font-size: 16px;
+            color: #888;
+        }
+        
+        .btn-calculate {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #00d4ff, #ff00aa);
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-calculate:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .btn-reset {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            color: #888;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-reset:active {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .result-card {
+            display: none;
+            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(255,0,170,0.1));
+            border: 2px solid rgba(0,212,255,0.3);
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-main {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .result-label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .result-value {
+            font-size: 72px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00d4ff, #ff00aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        
+        .result-unit {
+            font-size: 18px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .detail-value.positive { color: #4ade80; }
+        .detail-value.negative { color: #f87171; }
+        
+        .warning-box {
+            display: none;
+            background: rgba(255,100,100,0.1);
+            border: 1px solid rgba(255,100,100,0.3);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #ff9999;
+            text-align: center;
+        }
+        
+        .warning-box.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .tips {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+            padding: 16px;
+        }
+        
+        .tips strong {
+            color: #00d4ff;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 20px 0;
+        }
+        
+        .btn-copy {
+            background: rgba(0,212,255,0.2);
+            border: 1px solid rgba(0,212,255,0.3);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .btn-copy:active {
+            background: rgba(0,212,255,0.3);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚙️</div>
+            <div class="title">ABS齿数计算器</div>
+            <div class="subtitle">摩托车轮胎改装必备工具</div>
+        </div>
+        
+        <div class="card">
+            <div class="section-title">📱 原装轮胎尺寸</div>
+            <div class="tire-input">
+                <div class="input-group">
+                    <label>宽度</label>
+                    <input type="number" id="oldWidth" placeholder="120" inputmode="numeric">
+                </div>
+                <span class="separator">/</span>
+                <div class="input-group">
+                    <label>扁平比</label>
+                    <input type="number" id="oldRatio" placeholder="70" inputmode="numeric">
+                </div>
+                <span class="separator">-</span>
+                <div class="input-group">
+                    <label>轮毂(寸)</label>
+                    <input type="number" id="oldRim" placeholder="12" inputmode="numeric">
+                </div>
+            </div>
+            <div class="diameter-hint" id="oldHint"></div>
+            
+            <div class="divider"></div>
+            
+            <div class="section-title">⚙️ 原齿圈齿数</div>
+            <div class="gear-input">
+                <input type="number" id="oldTeeth" placeholder="请输入原齿圈齿数" inputmode="numeric">
+                <span class="gear-unit">齿</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="section-title">📱 新轮胎尺寸</div>
+            <div class="tire-input">
+                <div class="input-group">
+                    <label>宽度</label>
+                    <input type="number" id="newWidth" placeholder="130" inputmode="numeric">
+                </div>
+                <span class="separator">/</span>
+                <div class="input-group">
+                    <label>扁平比</label>
+                    <input type="number" id="newRatio" placeholder="70" inputmode="numeric">
+                </div>
+                <span class="separator">-</span>
+                <div class="input-group">
+                    <label>轮毂(寸)</label>
+                    <input type="number" id="newRim" placeholder="12" inputmode="numeric">
+                </div>
+            </div>
+            <div class="diameter-hint" id="newHint"></div>
+        </div>
+        
+        <button class="btn-calculate" onclick="calculate()">计算齿圈齿数</button>
+        <button class="btn-reset" onclick="resetForm()">重置</button>
+        
+        <div class="card result-card" id="resultCard">
+            <div class="result-main">
+                <div class="result-label">建议更换齿圈齿数</div>
+                <div class="result-value" id="newTeeth">0</div>
+                <div class="result-unit">齿</div>
+                <button class="btn-copy" onclick="copyResult()">复制结果</button>
+            </div>
+            <div class="result-details">
+                <div class="detail-item">
+                    <div class="detail-label">直径变化</div>
+                    <div class="detail-value" id="diameterChange">0mm</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">周长变化</div>
+                    <div class="detail-value" id="circumferenceChange">0%</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">齿数变化</div>
+                    <div class="detail-value" id="teethChange">0齿</div>
+                </div>
+            </div>
+            <div class="warning-box" id="warning">
+                ⚠️ 轮胎周长变化超过10%，可能会影响ABS系统正常工作！
+            </div>
+        </div>
+        
+        <div class="tips">
+            <strong>计算公式：</strong><br>
+            轮胎直径 = 轮毂×25.4 + 2×(宽度×扁平比)<br>
+            新齿数 = 原齿数 × (新轮胎周长 ÷ 原轮胎周长)<br><br>
+            <strong>提示：</strong>改装轮胎后建议重新校准或更换齿圈，以确保ABS系统准确工作。
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">已复制到剪贴板</div>
+    
+    <script>
+        // 轮胎尺寸转直径（mm）
+        function tireToDiameter(width, ratio, rim) {
+            const rimMm = rim * 25.4;
+            const sidewall = width * ratio / 100;
+            return rimMm + sidewall * 2;
+        }
+        
+        // 实时显示直径
+        function updateHint(prefix) {
+            const w = parseFloat(document.getElementById(prefix + 'Width').value);
+            const r = parseFloat(document.getElementById(prefix + 'Ratio').value);
+            const rim = parseFloat(document.getElementById(prefix + 'Rim').value);
+            const hint = document.getElementById(prefix + 'Hint');
+            
+            if (w && r && rim) {
+                const d = tireToDiameter(w, r, rim);
+                hint.textContent = `= 直径 ${d.toFixed(0)}mm`;
+            } else {
+                hint.textContent = '';
+            }
+        }
+        
+        ['old', 'new'].forEach(p => {
+            ['Width', 'Ratio', 'Rim'].forEach(f => {
+                document.getElementById(p + f).addEventListener('input', () => updateHint(p));
+            });
+        });
+        
+        function calculate() {
+            const oldW = parseFloat(document.getElementById('oldWidth').value);
+            const oldR = parseFloat(document.getElementById('oldRatio').value);
+            const oldRim = parseFloat(document.getElementById('oldRim').value);
+            const oldTeeth = parseInt(document.getElementById('oldTeeth').value);
+            const newW = parseFloat(document.getElementById('newWidth').value);
+            const newR = parseFloat(document.getElementById('newRatio').value);
+            const newRim = parseFloat(document.getElementById('newRim').value);
+            
+            if (!oldW || !oldR || !oldRim || !oldTeeth || !newW || !newR || !newRim) {
+                showToast('请填写完整信息');
+                return;
+            }
+            
+            const oldD = tireToDiameter(oldW, oldR, oldRim);
+            const newD = tireToDiameter(newW, newR, newRim);
+            const oldC = Math.PI * oldD;
+            const newC = Math.PI * newD;
+            const newTeeth = Math.round(oldTeeth * (newC / oldC));
+            
+            document.getElementById('newTeeth').textContent = newTeeth;
+            
+            const dChange = newD - oldD;
+            const dPercent = (dChange / oldD * 100).toFixed(1);
+            const cPercent = ((newC - oldC) / oldC * 100).toFixed(1);
+            const tChange = newTeeth - oldTeeth;
+            const tPercent = (tChange / oldTeeth * 100).toFixed(1);
+            
+            const dEl = document.getElementById('diameterChange');
+            const cEl = document.getElementById('circumferenceChange');
+            const tEl = document.getElementById('teethChange');
+            
+            dEl.textContent = `${dChange > 0 ? '+' : ''}${dChange.toFixed(0)}mm (${dPercent > 0 ? '+' : ''}${dPercent}%)`;
+            dEl.className = 'detail-value ' + (dChange > 0 ? 'positive' : 'negative');
+            
+            cEl.textContent = `${cPercent > 0 ? '+' : ''}${cPercent}%`;
+            cEl.className = 'detail-value ' + (parseFloat(cPercent) > 0 ? 'positive' : 'negative');
+            
+            tEl.textContent = `${tChange > 0 ? '+' : ''}${tChange}齿 (${tPercent > 0 ? '+' : ''}${tPercent}%)`;
+            tEl.className = 'detail-value ' + (tChange > 0 ? 'positive' : 'negative');
+            
+            document.getElementById('warning').classList.toggle('show', Math.abs(parseFloat(cPercent)) > 10);
+            
+            document.getElementById('resultCard').style.display = 'block';
+            document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function resetForm() {
+            ['oldWidth', 'oldRatio', 'oldRim', 'oldTeeth', 'newWidth', 'newRatio', 'newRim'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('oldHint').textContent = '';
+            document.getElementById('newHint').textContent = '';
+            document.getElementById('resultCard').style.display = 'none';
+        }
+        
+        function copyResult() {
+            const teeth = document.getElementById('newTeeth').textContent;
+            const d = document.getElementById('diameterChange').textContent;
+            const c = document.getElementById('circumferenceChange').textContent;
+            
+            const text = `建议齿圈齿数：${teeth}齿\n直径变化：${d}\n周长变化：${c}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板'));
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('已复制到剪贴板');
+            }
+        }
+        
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
